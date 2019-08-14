@@ -219,12 +219,12 @@ public class QTabView extends TabView {
                 r = mTabIcon.getIconSelectWidth() != -1 ? mTabIcon.getIconSelectWidth() : drawable.getIntrinsicWidth();
                 b = mTabIcon.getIconSelectHeight() != -1 ? mTabIcon.getIconSelectHeight() : drawable.getIntrinsicHeight();
                 mIcon.setBackgroundResource(mTabIcon.getIconBackground());
-                mIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
             } else {
                 r = mTabIcon.getIconWidth() != -1 ? mTabIcon.getIconWidth() : drawable.getIntrinsicWidth();
                 b = mTabIcon.getIconHeight() != -1 ? mTabIcon.getIconHeight() : drawable.getIntrinsicHeight();
                 mIcon.setBackgroundResource(0);
             }
+            mIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
             drawable.setBounds(0, 0, r, b);
             mIcon.setImageDrawable(drawable);
 
@@ -246,12 +246,12 @@ public class QTabView extends TabView {
                         r = mTabIcon.getIconSelectWidth() != -1 ? mTabIcon.getIconSelectWidth() : drawable.getIntrinsicWidth();
                         b = mTabIcon.getIconSelectHeight() != -1 ? mTabIcon.getIconSelectHeight() : drawable.getIntrinsicHeight();
                         mIcon.setBackgroundResource(mTabIcon.getIconBackground());
-                        mIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                     } else {
                         r = mTabIcon.getIconWidth() != -1 ? mTabIcon.getIconWidth() : drawable.getIntrinsicWidth();
                         b = mTabIcon.getIconHeight() != -1 ? mTabIcon.getIconHeight() : drawable.getIntrinsicHeight();
                         mIcon.setBackgroundResource(0);
                     }
+                    mIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                     drawable.setBounds(0, 0, r, b);
                     mIcon.setImageDrawable(drawable);
 
