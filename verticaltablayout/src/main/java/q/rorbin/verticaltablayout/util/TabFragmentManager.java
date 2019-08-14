@@ -52,7 +52,7 @@ public class TabFragmentManager {
                 ft.hide(fragment);
             }
         }
-        ft.commit();
+        ft.commitNowAllowingStateLoss();
         mManager.executePendingTransactions();
     }
 
@@ -61,7 +61,7 @@ public class TabFragmentManager {
         for (Fragment fragment : mFragments) {
             ft.remove(fragment);
         }
-        ft.commit();
+        ft.commitAllowingStateLoss();
         mManager.executePendingTransactions();
         mManager = null;
         mFragments = null;

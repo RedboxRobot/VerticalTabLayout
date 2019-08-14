@@ -1,10 +1,10 @@
 package q.rorbin.verticaltablayoutdemo;
 
 import android.graphics.Color;
+import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,10 +16,8 @@ import java.util.Collections;
 import java.util.List;
 
 import q.rorbin.badgeview.Badge;
-import q.rorbin.badgeview.DisplayUtil;
-import q.rorbin.verticaltablayout.adapter.TabAdapter;
 import q.rorbin.verticaltablayout.VerticalTabLayout;
-import q.rorbin.verticaltablayout.widget.ITabView;
+import q.rorbin.verticaltablayout.adapter.TabAdapter;
 import q.rorbin.verticaltablayout.widget.TabView;
 
 public class MainActivity extends AppCompatActivity {
@@ -109,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
                     .setIconGravity(Gravity.START)
                     .setIconMargin(dp2px(5))
                     .setIconSize(dp2px(20), dp2px(20))
+                    .setIconSelectSize(dp2px(20), dp2px(20))
                     .build();
         }
 

@@ -13,11 +13,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ import static android.support.v4.view.ViewPager.SCROLL_STATE_SETTLING;
  * @author chqiu
  *         Email:qstumn@163.com
  */
-public class VerticalTabLayout extends ScrollView {
+public class VerticalTabLayout extends NestedScrollView {
     private Context mContext;
     private TabStrip mTabStrip;
     private int mColorIndicator;
@@ -637,7 +637,7 @@ public class VerticalTabLayout extends ScrollView {
     private class OnTabPageChangeListener implements ViewPager.OnPageChangeListener {
         private int mPreviousScrollState;
         private int mScrollState;
-        boolean mUpdataIndicator;
+        boolean mUpdateIndicator;
 
         public OnTabPageChangeListener() {
         }
@@ -646,14 +646,14 @@ public class VerticalTabLayout extends ScrollView {
         public void onPageScrollStateChanged(int state) {
             mPreviousScrollState = mScrollState;
             mScrollState = state;
-            mUpdataIndicator = !(mScrollState == SCROLL_STATE_SETTLING
+            mUpdateIndicator = !(mScrollState == SCROLL_STATE_SETTLING
                     && mPreviousScrollState == SCROLL_STATE_IDLE);
         }
 
         @Override
         public void onPageScrolled(int position, float positionOffset,
                                    int positionOffsetPixels) {
-            if (mUpdataIndicator) {
+            if (mUpdateIndicator) {
                 mTabStrip.moveIndicator(positionOffset + position);
             }
         }
@@ -661,7 +661,7 @@ public class VerticalTabLayout extends ScrollView {
         @Override
         public void onPageSelected(int position) {
             if (position != getSelectedTabPosition()) {
-                setTabSelected(position, !mUpdataIndicator, true);
+                setTabSelected(position, !mUpdateIndicator, true);
             }
         }
     }

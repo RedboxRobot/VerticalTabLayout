@@ -1,12 +1,21 @@
 package q.rorbin.verticaltablayoutdemo;
 
 /**
- * Created by chqiu on 2016/8/3.
+ * Created by Irvin on 2016/8/3.
  */
 public class MenuBean {
     public int mSelectIcon;
     public int mNormalIcon;
     public String mTitle;
+
+    public MenuBean(String title) {
+        mTitle = title;
+    }
+
+    public MenuBean(int selectIcon, int normalIcon) {
+        mSelectIcon = selectIcon;
+        mNormalIcon = normalIcon;
+    }
 
     public MenuBean(int mSelectIcon, int mNormalIcon, String mTitle) {
         this.mSelectIcon = mSelectIcon;
@@ -14,3 +23,4 @@ public class MenuBean {
         this.mTitle = mTitle;
     }
 }
+

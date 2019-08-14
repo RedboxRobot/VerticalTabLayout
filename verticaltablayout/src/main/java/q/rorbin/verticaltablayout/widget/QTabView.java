@@ -8,34 +8,35 @@ import android.os.Build;
 import android.support.annotation.Px;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.View;
-import android.widget.Checkable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import q.rorbin.badgeview.Badge;
-import q.rorbin.badgeview.QBadgeView;
 import q.rorbin.verticaltablayout.util.DisplayUtil;
-
-import static android.R.attr.checked;
-import static android.R.attr.gravity;
+import q.rorbin.verticaltablayout.util.GlideUtils;
 
 /**
- * @author chqiu
- *         Email:qstumn@163.com
+ * @author Irvin
  */
 public class QTabView extends TabView {
+    private static final int TITLE_ID = 0x000001;
+    private static final int ICON_ID = 0x000002;
+    private static final int CONTAINER_ID = 0x000003;
+
     private Context mContext;
+    private LinearLayout mViewContainer;
     private TextView mTitle;
+    private ImageView mIcon;
     private Badge mBadgeView;
     private TabIcon mTabIcon;
     private TabTitle mTabTitle;
     private TabBadge mTabBadge;
     private boolean mChecked;
     private Drawable mDefaultBackground;
+    private int mSelectedBackground;
 
 
     public QTabView(Context context) {
@@ -53,19 +54,24 @@ public class QTabView extends TabView {
         }
         TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs);
         mDefaultBackground = a.getDrawable(0);
+
         a.recycle();
         setDefaultBackground();
     }
 
     private void initView() {
-        setMinimumHeight(q.rorbin.badgeview.DisplayUtil.dp2px(mContext,25));
-        if (mTitle == null) {
-            mTitle = new TextView(mContext);
-            LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-            params.gravity = Gravity.CENTER;
-            mTitle.setLayoutParams(params);
-            this.addView(mTitle);
+        setMinimumHeight(DisplayUtil.dp2px(mContext,25));
+        if (mViewContainer == null) {
+            mViewContainer = new LinearLayout(mContext);
+            LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+            params.addRule(RelativeLayout.CENTER_IN_PARENT);
+            mViewContainer.setLayoutParams(params);
+            mViewContainer.setId(CONTAINER_ID);
+            mViewContainer.setGravity(Gravity.CENTER);
+            addView(mViewContainer);
         }
+
+        initIconGravity();
         initTitleView();
         initIconView();
         initBadge();
@@ -125,51 +131,167 @@ public class QTabView extends TabView {
         }
     }
 
+    private void initIconGravity() {
+        switch (mTabIcon.getIconGravity()) {
+            case Gravity.START:
+                mViewContainer.setOrientation(LinearLayout.HORIZONTAL);
+                if (mIcon == null) {
+                    mIcon = new ImageView(mContext);
+                    mIcon.setId(ICON_ID);
+                    mViewContainer.addView(mIcon);
+                }
+                if (mTitle == null) {
+                    mTitle = new TextView(mContext);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                    mTitle.setLayoutParams(params);
+                    mViewContainer.addView(mTitle);
+                }
+                break;
+            case Gravity.TOP:
+                mViewContainer.setOrientation(LinearLayout.VERTICAL);
+                if (mIcon == null) {
+                    mIcon = new ImageView(mContext);
+                    mIcon.setId(ICON_ID);
+                    mViewContainer.addView(mIcon);
+                }
+                if (mTitle == null) {
+                    mTitle = new TextView(mContext);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                    mTitle.setLayoutParams(params);
+                    mViewContainer.addView(mTitle);
+                }
+                break;
+            case Gravity.END:
+                mViewContainer.setOrientation(LinearLayout.HORIZONTAL);
+                if (mTitle == null) {
+                    mTitle = new TextView(mContext);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+                            LayoutParams.WRAP_CONTENT);
+                    mTitle.setLayoutParams(params);
+                    mViewContainer.addView(mTitle);
+                }
+                if (mIcon == null) {
+                    mIcon = new ImageView(mContext);
+                    mIcon.setId(ICON_ID);
+                    mViewContainer.addView(mIcon);
+                }
+                break;
+            case Gravity.BOTTOM:
+                if (mTitle == null) {
+                    mTitle = new TextView(mContext);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+                            LayoutParams.WRAP_CONTENT);
+                    mTitle.setLayoutParams(params);
+                    mViewContainer.addView(mTitle);
+                }
+                mViewContainer.setOrientation(LinearLayout.VERTICAL);
+                if (mIcon == null) {
+                    mIcon = new ImageView(mContext);
+                    mIcon.setId(ICON_ID);
+                    mViewContainer.addView(mIcon);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
     private void initTitleView() {
+        mTitle.setId(TITLE_ID);
         mTitle.setTextColor(isChecked() ? mTabTitle.getColorSelected() : mTabTitle.getColorNormal());
         mTitle.setTextSize(mTabTitle.getTitleTextSize());
         mTitle.setText(mTabTitle.getContent());
-        mTitle.setGravity(Gravity.CENTER);
+        mTitle.setGravity(Gravity.CENTER_HORIZONTAL);
         mTitle.setEllipsize(TextUtils.TruncateAt.END);
+        mTitle.setSingleLine();
         refreshDrawablePadding();
     }
 
     private void initIconView() {
+        mIcon.setId(ICON_ID);
         int iconResid = mChecked ? mTabIcon.getSelectedIcon() : mTabIcon.getNormalIcon();
-        Drawable drawable = null;
+        String iconUrl = mChecked ? mTabIcon.getSelectedIconUrl() : mTabIcon.getNormalIconUrl();
+        Drawable drawable;
         if (iconResid != 0) {
+            int r, b;
             drawable = mContext.getResources().getDrawable(iconResid);
-            int r = mTabIcon.getIconWidth() != -1 ? mTabIcon.getIconWidth() : drawable.getIntrinsicWidth();
-            int b = mTabIcon.getIconHeight() != -1 ? mTabIcon.getIconHeight() : drawable.getIntrinsicHeight();
+            if (mChecked) {
+                r = mTabIcon.getIconSelectWidth() != -1 ? mTabIcon.getIconSelectWidth() : drawable.getIntrinsicWidth();
+                b = mTabIcon.getIconSelectHeight() != -1 ? mTabIcon.getIconSelectHeight() : drawable.getIntrinsicHeight();
+                mIcon.setBackgroundResource(mTabIcon.getIconBackground());
+                mIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+            } else {
+                r = mTabIcon.getIconWidth() != -1 ? mTabIcon.getIconWidth() : drawable.getIntrinsicWidth();
+                b = mTabIcon.getIconHeight() != -1 ? mTabIcon.getIconHeight() : drawable.getIntrinsicHeight();
+                mIcon.setBackgroundResource(0);
+            }
             drawable.setBounds(0, 0, r, b);
-        }
-        switch (mTabIcon.getIconGravity()) {
-            case Gravity.START:
-                mTitle.setCompoundDrawables(drawable, null, null, null);
-                break;
-            case Gravity.TOP:
-                mTitle.setCompoundDrawables(null, drawable, null, null);
-                break;
-            case Gravity.END:
-                mTitle.setCompoundDrawables(null, null, drawable, null);
-                break;
-            case Gravity.BOTTOM:
-                mTitle.setCompoundDrawables(null, null, null, drawable);
-                break;
+            mIcon.setImageDrawable(drawable);
+
+            //设置大小
+            LinearLayout.LayoutParams ivParams = new LinearLayout.LayoutParams(r == 0 ? LayoutParams.WRAP_CONTENT : r,
+                    b == 0 ? LayoutParams.WRAP_CONTENT : b);
+            if (mTabIcon.getIconGravity() == Gravity.START || mTabIcon.getIconGravity() == Gravity.END) {
+                ivParams.gravity = Gravity.CENTER_VERTICAL;
+            } else if (mTabIcon.getIconGravity() == Gravity.TOP || mTabIcon.getIconGravity() == Gravity.BOTTOM) {
+                ivParams.gravity = Gravity.CENTER_HORIZONTAL;
+            }
+            mIcon.setLayoutParams(ivParams);
+        } else if (!TextUtils.isEmpty(iconUrl)) {
+            GlideUtils.getImageDrawable(mContext, iconUrl, new GlideUtils.DrawableCallback() {
+                @Override
+                public void onGetDrawableDone(Drawable drawable) {
+                    int r, b;
+                    if (mChecked) {
+                        r = mTabIcon.getIconSelectWidth() != -1 ? mTabIcon.getIconSelectWidth() : drawable.getIntrinsicWidth();
+                        b = mTabIcon.getIconSelectHeight() != -1 ? mTabIcon.getIconSelectHeight() : drawable.getIntrinsicHeight();
+                        mIcon.setBackgroundResource(mTabIcon.getIconBackground());
+                        mIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+                    } else {
+                        r = mTabIcon.getIconWidth() != -1 ? mTabIcon.getIconWidth() : drawable.getIntrinsicWidth();
+                        b = mTabIcon.getIconHeight() != -1 ? mTabIcon.getIconHeight() : drawable.getIntrinsicHeight();
+                        mIcon.setBackgroundResource(0);
+                    }
+                    drawable.setBounds(0, 0, r, b);
+                    mIcon.setImageDrawable(drawable);
+
+                    //设置大小
+                    LinearLayout.LayoutParams ivParams = new LinearLayout.LayoutParams(r == 0 ? LayoutParams.WRAP_CONTENT : r,
+                            b == 0 ? LayoutParams.WRAP_CONTENT : b);
+                    if (mTabIcon.getIconGravity() == Gravity.START || mTabIcon.getIconGravity() == Gravity.END) {
+                        ivParams.gravity = Gravity.CENTER_VERTICAL;
+                    } else if (mTabIcon.getIconGravity() == Gravity.TOP || mTabIcon.getIconGravity() == Gravity.BOTTOM) {
+                        ivParams.gravity = Gravity.CENTER_HORIZONTAL;
+                    }
+                    mIcon.setLayoutParams(ivParams);
+                }
+            });
         }
         refreshDrawablePadding();
     }
 
     private void refreshDrawablePadding() {
         int iconResid = mChecked ? mTabIcon.getSelectedIcon() : mTabIcon.getNormalIcon();
-        if (iconResid != 0) {
-            if (!TextUtils.isEmpty(mTabTitle.getContent()) && mTitle.getCompoundDrawablePadding() != mTabIcon.getMargin()) {
-                mTitle.setCompoundDrawablePadding(mTabIcon.getMargin());
-            } else if (TextUtils.isEmpty(mTabTitle.getContent())) {
-                mTitle.setCompoundDrawablePadding(0);
+        String iconUrl = mChecked ? mTabIcon.getSelectedIconUrl() : mTabIcon.getNormalIconUrl();
+        if (iconResid != 0 || !TextUtils.isEmpty(iconUrl)) {
+            LinearLayout.LayoutParams ivParams = (LinearLayout.LayoutParams) mIcon.getLayoutParams();
+            switch (mTabIcon.getIconGravity()) {
+                case Gravity.START:
+                    ivParams.setMarginEnd(mTabIcon.getMargin());
+                    break;
+                case Gravity.TOP:
+                    ivParams.setMargins(0, 0, 0, mTabIcon.getMargin());
+                    break;
+                case Gravity.END:
+                    ivParams.setMarginStart(mTabIcon.getMargin());
+                    break;
+                case Gravity.BOTTOM:
+                    ivParams.setMargins(0, mTabIcon.getMargin(), 0, 0);
+                    break;
+                default:
+                    break;
             }
-        } else {
-            mTitle.setCompoundDrawablePadding(0);
+            mIcon.setLayoutParams(ivParams);
         }
     }
 
@@ -187,6 +309,7 @@ public class QTabView extends TabView {
         if (icon != null) {
             mTabIcon = icon;
         }
+        initIconGravity();
         initIconView();
         return this;
     }
@@ -211,6 +334,16 @@ public class QTabView extends TabView {
         } else if (resId <= 0) {
             setBackground(null);
         } else {
+            super.setBackgroundResource(resId);
+        }
+        return this;
+    }
+
+    public QTabView setSelectedBackground(int resId) {
+        if (resId <= 0 ) {
+            setDefaultBackground();
+        } else {
+            mSelectedBackground = resId;
             super.setBackgroundResource(resId);
         }
         return this;
@@ -267,11 +400,23 @@ public class QTabView extends TabView {
         }
     }
 
+    private void setSelectedDefaultBackground() {
+        if (mSelectedBackground > 0 && getBackground() != getResources().getDrawable(mSelectedBackground)) {
+            setBackground(mSelectedBackground);
+        }
+    }
+
     @Override
     public void setChecked(boolean checked) {
         mChecked = checked;
         setSelected(checked);
         refreshDrawableState();
+
+        if (checked) {
+            setSelectedDefaultBackground();
+        } else {
+            setDefaultBackground();
+        }
         mTitle.setTextColor(checked ? mTabTitle.getColorSelected() : mTabTitle.getColorNormal());
         initIconView();
     }

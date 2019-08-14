@@ -46,6 +46,14 @@ public interface ITabView {
             return mBuilder.mNormalIcon;
         }
 
+        public String getSelectedIconUrl() {
+            return mBuilder.mSelectedIconUrl;
+        }
+
+        public String getNormalIconUrl() {
+            return mBuilder.mNormalIconUrl;
+        }
+
         public int getIconGravity() {
             return mBuilder.mIconGravity;
         }
@@ -58,6 +66,18 @@ public interface ITabView {
             return mBuilder.mIconHeight;
         }
 
+        public int getIconSelectWidth() {
+            return mBuilder.mIconSelectWidth;
+        }
+
+        public int getIconSelectHeight() {
+            return mBuilder.mIconSelectHeight;
+        }
+
+        public int getIconBackground() {
+            return mBuilder.mIconBackground;
+        }
+
         public int getMargin() {
             return mBuilder.mMargin;
         }
@@ -65,18 +85,33 @@ public interface ITabView {
         public static class Builder {
             private int mSelectedIcon;
             private int mNormalIcon;
+            private String mSelectedIconUrl;
+            private String mNormalIconUrl;
             private int mIconGravity;
             private int mIconWidth;
             private int mIconHeight;
+            private int mIconSelectWidth;
+            private int mIconSelectHeight;
+            private int mIconBackground;
             private int mMargin;
 
             public Builder() {
                 mSelectedIcon = 0;
                 mNormalIcon = 0;
+                mSelectedIconUrl = "";
+                mNormalIconUrl = "";
                 mIconWidth = -1;
                 mIconHeight = -1;
-                mIconGravity = Gravity.START;
+                mIconSelectWidth = -1;
+                mIconSelectHeight = -1;
+                mIconGravity = Gravity.TOP;
                 mMargin = 0;
+            }
+
+            public Builder setIcon(String selectedIconUrl, String normalIconUrl) {
+                mSelectedIconUrl = selectedIconUrl;
+                mNormalIconUrl = normalIconUrl;
+                return this;
             }
 
             public Builder setIcon(int selectIconResId, int normalIconResId) {
@@ -91,6 +126,12 @@ public interface ITabView {
                 return this;
             }
 
+            public Builder setIconSelectSize(int width, int height) {
+                mIconSelectWidth = width;
+                mIconSelectHeight = height;
+                return this;
+            }
+
             public Builder setIconGravity(int gravity) {
                 if (gravity != Gravity.START && gravity != Gravity.END
                         & gravity != Gravity.TOP & gravity != Gravity.BOTTOM) {
@@ -98,6 +139,11 @@ public interface ITabView {
                             "or Gravity.END or Gravity.TOP or Gravity.BOTTOM");
                 }
                 mIconGravity = gravity;
+                return this;
+            }
+
+            public Builder setIconBackground(int iconBackground) {
+                mIconBackground = iconBackground;
                 return this;
             }
 
