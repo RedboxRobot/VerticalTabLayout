@@ -204,7 +204,6 @@ public class QTabView extends TabView {
         mTitle.setGravity(Gravity.CENTER_HORIZONTAL);
         mTitle.setEllipsize(TextUtils.TruncateAt.END);
         mTitle.setSingleLine();
-        refreshDrawablePadding();
     }
 
     private void initIconView() {
@@ -213,86 +212,63 @@ public class QTabView extends TabView {
         String iconUrl = mChecked ? mTabIcon.getSelectedIconUrl() : mTabIcon.getNormalIconUrl();
         Drawable drawable;
         if (iconResid != 0) {
-            int r, b;
             drawable = mContext.getResources().getDrawable(iconResid);
-            if (mChecked) {
-                r = mTabIcon.getIconSelectWidth() != -1 ? mTabIcon.getIconSelectWidth() : drawable.getIntrinsicWidth();
-                b = mTabIcon.getIconSelectHeight() != -1 ? mTabIcon.getIconSelectHeight() : drawable.getIntrinsicHeight();
-                mIcon.setBackgroundResource(mTabIcon.getIconBackground());
-            } else {
-                r = mTabIcon.getIconWidth() != -1 ? mTabIcon.getIconWidth() : drawable.getIntrinsicWidth();
-                b = mTabIcon.getIconHeight() != -1 ? mTabIcon.getIconHeight() : drawable.getIntrinsicHeight();
-                mIcon.setBackgroundResource(0);
-            }
-            mIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-            drawable.setBounds(0, 0, r, b);
-            mIcon.setImageDrawable(drawable);
-
-            //设置大小
-            LinearLayout.LayoutParams ivParams = new LinearLayout.LayoutParams(r == 0 ? LayoutParams.WRAP_CONTENT : r,
-                    b == 0 ? LayoutParams.WRAP_CONTENT : b);
-            if (mTabIcon.getIconGravity() == Gravity.START || mTabIcon.getIconGravity() == Gravity.END) {
-                ivParams.gravity = Gravity.CENTER_VERTICAL;
-            } else if (mTabIcon.getIconGravity() == Gravity.TOP || mTabIcon.getIconGravity() == Gravity.BOTTOM) {
-                ivParams.gravity = Gravity.CENTER_HORIZONTAL;
-            }
-            mIcon.setLayoutParams(ivParams);
+            refreshIconDrawableParams(drawable);
         } else if (!TextUtils.isEmpty(iconUrl)) {
             GlideUtils.getImageDrawable(mContext, iconUrl, new GlideUtils.DrawableCallback() {
                 @Override
                 public void onGetDrawableDone(Drawable drawable) {
-                    int r, b;
-                    if (mChecked) {
-                        r = mTabIcon.getIconSelectWidth() != -1 ? mTabIcon.getIconSelectWidth() : drawable.getIntrinsicWidth();
-                        b = mTabIcon.getIconSelectHeight() != -1 ? mTabIcon.getIconSelectHeight() : drawable.getIntrinsicHeight();
-                        mIcon.setBackgroundResource(mTabIcon.getIconBackground());
-                    } else {
-                        r = mTabIcon.getIconWidth() != -1 ? mTabIcon.getIconWidth() : drawable.getIntrinsicWidth();
-                        b = mTabIcon.getIconHeight() != -1 ? mTabIcon.getIconHeight() : drawable.getIntrinsicHeight();
-                        mIcon.setBackgroundResource(0);
-                    }
-                    mIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-                    drawable.setBounds(0, 0, r, b);
-                    mIcon.setImageDrawable(drawable);
-
-                    //设置大小
-                    LinearLayout.LayoutParams ivParams = new LinearLayout.LayoutParams(r == 0 ? LayoutParams.WRAP_CONTENT : r,
-                            b == 0 ? LayoutParams.WRAP_CONTENT : b);
-                    if (mTabIcon.getIconGravity() == Gravity.START || mTabIcon.getIconGravity() == Gravity.END) {
-                        ivParams.gravity = Gravity.CENTER_VERTICAL;
-                    } else if (mTabIcon.getIconGravity() == Gravity.TOP || mTabIcon.getIconGravity() == Gravity.BOTTOM) {
-                        ivParams.gravity = Gravity.CENTER_HORIZONTAL;
-                    }
-                    mIcon.setLayoutParams(ivParams);
+                    refreshIconDrawableParams(drawable);
                 }
             });
         }
-        refreshDrawablePadding();
     }
 
-    private void refreshDrawablePadding() {
+    private void refreshIconDrawableParams(Drawable drawable) {
+        int r, b;
+        if (mChecked) {
+            r = mTabIcon.getIconSelectWidth() != -1 ? mTabIcon.getIconSelectWidth() : drawable.getIntrinsicWidth();
+            b = mTabIcon.getIconSelectHeight() != -1 ? mTabIcon.getIconSelectHeight() : drawable.getIntrinsicHeight();
+            mIcon.setBackgroundResource(mTabIcon.getIconBackground());
+        } else {
+            r = mTabIcon.getIconWidth() != -1 ? mTabIcon.getIconWidth() : drawable.getIntrinsicWidth();
+            b = mTabIcon.getIconHeight() != -1 ? mTabIcon.getIconHeight() : drawable.getIntrinsicHeight();
+            mIcon.setBackgroundResource(0);
+        }
+        mIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        drawable.setBounds(0, 0, r, b);
+        mIcon.setImageDrawable(drawable);
+
+        //设置属性
+        LinearLayout.LayoutParams ivParams = new LinearLayout.LayoutParams(r == 0 ? LayoutParams.WRAP_CONTENT : r,
+                b == 0 ? LayoutParams.WRAP_CONTENT : b);
+
         int iconResid = mChecked ? mTabIcon.getSelectedIcon() : mTabIcon.getNormalIcon();
         String iconUrl = mChecked ? mTabIcon.getSelectedIconUrl() : mTabIcon.getNormalIconUrl();
         if (iconResid != 0 || !TextUtils.isEmpty(iconUrl)) {
-            LinearLayout.LayoutParams ivParams = (LinearLayout.LayoutParams) mIcon.getLayoutParams();
             switch (mTabIcon.getIconGravity()) {
                 case Gravity.START:
+                    ivParams.gravity = Gravity.CENTER_VERTICAL;
                     ivParams.setMarginEnd(mTabIcon.getMargin());
                     break;
                 case Gravity.TOP:
+                    ivParams.gravity = Gravity.CENTER_HORIZONTAL;
                     ivParams.setMargins(0, 0, 0, mTabIcon.getMargin());
                     break;
                 case Gravity.END:
+                    ivParams.gravity = Gravity.CENTER_VERTICAL;
                     ivParams.setMarginStart(mTabIcon.getMargin());
                     break;
                 case Gravity.BOTTOM:
+                    ivParams.gravity = Gravity.CENTER_HORIZONTAL;
                     ivParams.setMargins(0, mTabIcon.getMargin(), 0, 0);
                     break;
                 default:
                     break;
             }
-            mIcon.setLayoutParams(ivParams);
         }
+        mIcon.setLayoutParams(ivParams);
+        requestLayout();
     }
 
     @Override
